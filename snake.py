@@ -5,8 +5,8 @@ import random
  
 pygame.init() 
  
-dis_width = 800 
-dis_height = 600 
+dis_width = 800
+dis_height = 600
 dis = pygame.display.set_mode((dis_width, dis_height)) 
 pygame.display.set_caption("Igor's first snake game 1.0") 
  
@@ -24,20 +24,25 @@ font_style = pygame.font.SysFont('bahnschrift', 30)
 score_font = pygame.font.SysFont('comicsansms', 35) 
 
 def your_score(score):
+    # Формирование текста с актуальным значением счета
     value = score_font.render('Your score: ' + str(score), True, yellow)
     dis.blit(value, [0, 0])
 
 def your_snake(snake_list, color):
+    # Вырисовывание змейки
     for element in snake_list:
         pygame.draw.circle(dis, color, (element[0], element[1]), 10)
 
 def message(msg_score, color, msg, color_2): 
-    mes = font_style.render(msg_score, True, color)
+    # Выводим прозрачные прямоугольники с текстом после завершения игры
+    mes_score = font_style.render(msg_score, True, color)
     mes_2 = font_style.render(msg, True, color_2) 
-    dis.blit(mes, [dis_width / 2.5, dis_height / 3])
-    dis.blit(mes_2, [dis_width / 4.6, dis_height / 2.5]) 
- 
- 
+    position_1 = mes_score.get_rect(center = (dis_width / 2, dis_height / 3) )
+    position_2 = mes_2.get_rect(center = (dis_width / 2, dis_height / 2) )
+    dis.blit(mes_score, position_1)
+    dis.blit(mes_2, position_2) 
+
+
 def gameloop(): 
     pixel = 1
     snake_speed = 180
@@ -53,8 +58,7 @@ def gameloop():
  
     foodx = round(random.randrange(0, dis_width - 10) / 10.0) * 10.0 
     foody = round(random.randrange(0, dis_height - 10) / 10.0) * 10.0 
- 
-    game = True 
+    game = True
     game_close = False 
     while game: 
  
@@ -73,34 +77,27 @@ def gameloop():
                         game_close = False
                     if event.key == pygame.K_p: 
                         dis.fill(black) 
-                        gameloop() 
+                        game_func()
+
 
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
                 game = False 
             if event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_a:
-                    if len(snake_list) > 1 and snake_list[-1][0] == (snake_list[-2][0] + 1):
-                        None 
-                    else:
+                    if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] + 1):
                         x1_change = -pixel 
                         y1_change = 0 
                 elif event.key == pygame.K_w:
-                    if len(snake_list) > 1 and snake_list[-1][1] == (snake_list[-2][1] + 1):
-                        None 
-                    else:
+                    if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] + 1):
                         x1_change = 0 
                         y1_change = -pixel 
                 elif event.key == pygame.K_s:
-                    if len(snake_list) > 1 and snake_list[-1][1] == (snake_list[-2][1] - 1):
-                        None 
-                    else:
+                    if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] - 1):
                         x1_change = 0 
                         y1_change = pixel 
                 elif event.key == pygame.K_d: 
-                    if len(snake_list) > 1 and snake_list[-1][0] == (snake_list[-2][0] - 1):
-                        None
-                    else:    
+                    if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] - 1):
                         x1_change = pixel 
                         y1_change = 0 
  
@@ -140,5 +137,10 @@ def gameloop():
     pygame.quit() 
     quit() 
  
- 
-gameloop()        
+def game_func():
+    while True:
+        gameloop()
+
+
+if __name__ == '__main__':
+    game_func()    

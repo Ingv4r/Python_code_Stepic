@@ -1,4 +1,3 @@
-from turtle import width
 import pygame
 import time 
 import random 
@@ -25,18 +24,41 @@ font_style = pygame.font.SysFont('bahnschrift', 30)
 score_font = pygame.font.SysFont('comicsansms', 35) 
 
 
-def render_now_score(score):
-    value = score_font.render('Your score: ' + str(score), True, yellow)
-    dis.blit(value, [0, 0])
-
-def draw_snake(snake_list, color):
+def draw_snake(snake_list, color, circle_rad):
     for element in snake_list:
-        pygame.draw.circle(dis, color, (element[0], element[1]), 10)
+        pygame.draw.circle(dis, color, (element[0], element[1]), circle_rad)
 
-def render_text_and_position(text, font, color, width, height): 
+
+def render_text_and_position(text, font, color, width = 0, height = 0): 
     message = font.render(text, True, color)
-    position = message.get_rect(center = (dis_width / width, dis_height / height))
+    position = [0, 0]
+    if width != 0 and height != 0:
+        position = message.get_rect(center = (dis_width / width, dis_height / height))
     dis.blit(message, position)
+
+
+def move_if_not_collision(snake_list, key): # -> bool
+    if key == 'a':
+        if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] + 1): 
+            return True 
+        else:
+            return False
+    elif key == 'w':
+        if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] + 1):
+            return True
+        else:
+            return False
+    elif key == 's':
+        if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] - 1):
+            return True
+        else:
+            return False
+    elif key == 'd': 
+        if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] - 1):
+            return True
+        else:
+            return False
+
 
 def gameloop(): 
     pixel = 1
@@ -50,12 +72,14 @@ def gameloop():
 
     snake_list = []
     length_of_snake = 1
- 
-    foodx = round(random.randrange(8, dis_width - 8)) 
-    foody = round(random.randrange(8, dis_height - 8)) 
+
+    food_radius = 8
+    foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
+    foody = round(random.randrange(food_radius, dis_height - food_radius)) 
 
     game = True
     game_close = False 
+
     while game: 
  
         while game_close == True: 
@@ -64,7 +88,7 @@ def gameloop():
             height_of_message = 2
             width_of_score = 2
             width_of_message = 2
-            render_text_and_position("Your score: " + str(length_of_snake // 10), score_font, white, width_of_score, height_of_score)
+            render_text_and_position("Your score: " + str(score), score_font, white, width_of_score, height_of_score)
             render_text_and_position("Press 'Q' to Quit or 'P' to Play Again", font_style, red, width_of_message, height_of_message)
              
             pygame.display.update()        
@@ -81,27 +105,31 @@ def gameloop():
                         dis.fill(black) 
                         game_close = False
 
+                        x1 = dis_width / 2 
+                        y1 = dis_height / 2
+
+                        snake_list = []
+                        length_of_snake = 1
+                    
+                        foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
+                        foody = round(random.randrange(food_radius, dis_height - food_radius)) 
 
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
                 game = False 
             if event.type == pygame.KEYDOWN: 
-                if event.key == pygame.K_a:
-                    if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] + 1):
-                        x1_change = -pixel 
-                        y1_change = 0 
-                elif event.key == pygame.K_w:
-                    if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] + 1):
-                        x1_change = 0 
-                        y1_change = -pixel 
-                elif event.key == pygame.K_s:
-                    if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] - 1):
-                        x1_change = 0 
-                        y1_change = pixel 
-                elif event.key == pygame.K_d: 
-                    if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] - 1):
-                        x1_change = pixel 
-                        y1_change = 0 
+                if event.key == pygame.K_a and move_if_not_collision(snake_list, 'a'):
+                    x1_change = -pixel
+                    y1_change = 0
+                elif event.key == pygame.K_w and move_if_not_collision(snake_list, 'w'):
+                    x1_change = 0
+                    y1_change = -pixel
+                elif event.key == pygame.K_s and move_if_not_collision(snake_list, 's'):
+                    x1_change = 0
+                    y1_change = pixel
+                elif event.key == pygame.K_d and move_if_not_collision(snake_list, 'd'): 
+                    x1_change = pixel
+                    y1_change = 0
  
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0: 
             game_close = True  
@@ -111,7 +139,7 @@ def gameloop():
         
         dis.fill(black)
 
-        pygame.draw.circle(dis, green, (foodx, foody), 8)
+        pygame.draw.circle(dis, green, (foodx, foody), food_radius)
 
         snake_head = []
         snake_head.append(x1)
@@ -124,15 +152,15 @@ def gameloop():
             if x == snake_head:
                 game_close = True
         
-        draw_snake(snake_list, white)
-        render_now_score(length_of_snake // 10)
-        'Your score: ' + str(score), True, yellow
+        draw_snake(snake_list, white, 10)
+        score = length_of_snake // 10
+        render_text_and_position('Your score: ' + str(score), score_font, yellow)
  
         pygame.display.update() 
  
         if (foodx - 11) <= x1 <= (foodx + 11) and (foody - 11) <= y1 <= (foody + 11):
-            foodx = round(random.randrange(8, dis_width - 8)) 
-            foody = round(random.randrange(8, dis_height - 8))
+            foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
+            foody = round(random.randrange(food_radius, dis_height - food_radius)) 
             length_of_snake += 10
         
         clock.tick(snake_speed) 
@@ -142,4 +170,3 @@ def gameloop():
  
 
 gameloop()
-

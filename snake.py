@@ -23,24 +23,28 @@ clock = pygame.time.Clock()
 font_style = pygame.font.SysFont('bahnschrift', 30)
 score_font = pygame.font.SysFont('comicsansms', 35) 
 
+
 def your_score(score):
-    # Формирование текста с актуальным значением счета
     value = score_font.render('Your score: ' + str(score), True, yellow)
     dis.blit(value, [0, 0])
 
-def your_snake(snake_list, color):
-    # Вырисовывание змейки
+def draw_snake(snake_list, color):
     for element in snake_list:
         pygame.draw.circle(dis, color, (element[0], element[1]), 10)
 
-def message(msg_score, color, msg, color_2): 
-    # Выводим прозрачные прямоугольники с текстом после завершения игры
-    mes_score = font_style.render(msg_score, True, color)
-    mes_2 = font_style.render(msg, True, color_2) 
+def render_message(mes, position):
+    dis.blit(mes, position)
+
+def position_of_text(mes_score, mes_2): 
     position_1 = mes_score.get_rect(center = (dis_width / 2, dis_height / 3) )
     position_2 = mes_2.get_rect(center = (dis_width / 2, dis_height / 2) )
-    dis.blit(mes_score, position_1)
-    dis.blit(mes_2, position_2) 
+    render_message(mes_score, position_1)
+    render_message(mes_2, position_2)
+
+def text(msg_score, color, msg, color_2): 
+    mes_score = font_style.render(msg_score, True, color)
+    mes_2 = font_style.render(msg, True, color_2)
+    position_of_text(mes_score, mes_2)
 
 
 def gameloop(): 
@@ -64,7 +68,7 @@ def gameloop():
  
         while game_close == True: 
             dis.fill(black) 
-            message(("Your score: " + str(length_of_snake // 10)), white, "Press 'Q' to Quit or 'P' to Play Again", red) 
+            text(("Your score: " + str(length_of_snake // 10)), white, "Press 'Q' to Quit or 'P' to Play Again", red) 
             pygame.display.update()        
          
             for event in pygame.event.get(): 
@@ -122,12 +126,12 @@ def gameloop():
             if x == snake_head:
                 game_close = True
         
-        your_snake(snake_list, white)
+        draw_snake(snake_list, white)
         your_score(length_of_snake // 10)
  
         pygame.display.update() 
  
-        if (foodx - 9) <= x1 <= (foodx + 9) and (foody - 9) <= y1 <= (foody + 9):
+        if (foodx - 11) <= x1 <= (foodx + 11) and (foody - 11) <= y1 <= (foody + 11):
             foodx = round(random.randrange(10, dis_width - 10) / 10.0) * 10.0 
             foody = round(random.randrange(10, dis_height - 10) / 10.0) * 10.0
             length_of_snake += 10
@@ -143,4 +147,4 @@ def game_func():
 
 
 if __name__ == '__main__':
-    game_func()    
+    game_func() 

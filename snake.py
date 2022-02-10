@@ -1,3 +1,4 @@
+from turtle import width
 import pygame
 import time 
 import random 
@@ -32,10 +33,10 @@ def draw_snake(snake_list, color):
     for element in snake_list:
         pygame.draw.circle(dis, color, (element[0], element[1]), 10)
 
-def render_text_and_position(text, color, height): 
-    message = font_style.render(text, True, color)
-    position_on_center = message.get_rect(center = (dis_width / 2, dis_height / height))
-    dis.blit(message, position_on_center)
+def render_text_and_position(text, font, color, width, height): 
+    message = font.render(text, True, color)
+    position = message.get_rect(center = (dis_width / width, dis_height / height))
+    dis.blit(message, position)
 
 def gameloop(): 
     pixel = 1
@@ -59,8 +60,12 @@ def gameloop():
  
         while game_close == True: 
             dis.fill(black) 
-            render_text_and_position("Your score: " + str(length_of_snake // 10), white, 3)
-            render_text_and_position("Press 'Q' to Quit or 'P' to Play Again", red, 2)
+            height_of_score = 3
+            height_of_message = 2
+            width_of_score = 2
+            width_of_message = 2
+            render_text_and_position("Your score: " + str(length_of_snake // 10), score_font, white, width_of_score, height_of_score)
+            render_text_and_position("Press 'Q' to Quit or 'P' to Play Again", font_style, red, width_of_message, height_of_message)
              
             pygame.display.update()        
          
@@ -74,7 +79,7 @@ def gameloop():
                         game_close = False
                     if event.key == pygame.K_p: 
                         dis.fill(black) 
-                        game_func()
+                        game_close = False
 
 
         for event in pygame.event.get(): 
@@ -121,6 +126,7 @@ def gameloop():
         
         draw_snake(snake_list, white)
         render_now_score(length_of_snake // 10)
+        'Your score: ' + str(score), True, yellow
  
         pygame.display.update() 
  
@@ -134,10 +140,6 @@ def gameloop():
     pygame.quit() 
     quit() 
  
-def game_func():
-    while True:
-        gameloop()
 
+gameloop()
 
-if __name__ == '__main__':
-    game_func()    

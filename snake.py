@@ -23,8 +23,41 @@ clock = pygame.time.Clock()
 font_style = pygame.font.SysFont('bahnschrift', 30)
 score_font = pygame.font.SysFont('comicsansms', 35) 
 
+def quit_game():
+    quit()
 
-def draw_snake(snake_list, color, circle_rad):
+def endgame_keypress(event):
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_q:
+            quit_game()
+        elif event.key == pygame.K_p: 
+            dis.fill(black) 
+            gameloop()
+
+def move_keypress(event):
+    x1_change = 0
+    y1_change = 0
+    pixel = 1
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_w:
+            x1_change = 0
+            y1_change = -pixel
+            return x1_change, y1_change
+        elif event.key == pygame.K_a:
+            x1_change = -pixel
+            y1_change = 0
+            return x1_change, y1_change
+        elif event.key == pygame.K_s:
+            x1_change = 0
+            y1_change = pixel
+            return x1_change, y1_change
+        elif event.key == pygame.K_d:
+            x1_change = pixel
+            y1_change = 0
+            return x1_change, y1_change
+
+
+def draw_snake(snake_list, color = white, circle_rad = 10):
     for element in snake_list:
         pygame.draw.circle(dis, color, (element[0], element[1]), circle_rad)
 
@@ -37,8 +70,13 @@ def render_text_and_position(text, font, color, width = 0, height = 0):
     dis.blit(message, position)
 
 
-def move_if_not_collision(snake_list, key): # -> bool
-    if key == 'a':
+def check_collision(snake_list, key): # -> bool
+    if True:
+        pass
+    
+    
+    
+'''if key == 'a'
         if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] + 1): 
             return True 
         else:
@@ -57,11 +95,10 @@ def move_if_not_collision(snake_list, key): # -> bool
         if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] - 1):
             return True
         else:
-            return False
+            return False'''
 
 
 def gameloop(): 
-    pixel = 1
     snake_speed = 180
  
     x1 = dis_width / 2 
@@ -76,9 +113,9 @@ def gameloop():
     food_radius = 8
     foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
     foody = round(random.randrange(food_radius, dis_height - food_radius)) 
-
+ 
     game = True
-    game_close = False 
+    game_close = False
 
     while game: 
  
@@ -94,43 +131,19 @@ def gameloop():
             pygame.display.update()        
          
             for event in pygame.event.get(): 
-                if event.type == pygame.QUIT: 
-                        game = False 
-                        game_close = False
-                if event.type == pygame.KEYDOWN: 
-                    if event.key == pygame.K_q: 
-                        game = False 
-                        game_close = False
-                    if event.key == pygame.K_p: 
-                        dis.fill(black) 
-                        game_close = False
-
-                        x1 = dis_width / 2 
-                        y1 = dis_height / 2
-
-                        snake_list = []
-                        length_of_snake = 1
-                    
-                        foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
-                        foody = round(random.randrange(food_radius, dis_height - food_radius)) 
+                if event.type == pygame.QUIT:
+                    quit_game()
+                else:
+                    endgame_keypress(event)
 
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
-                game = False 
-            if event.type == pygame.KEYDOWN: 
-                if event.key == pygame.K_a and move_if_not_collision(snake_list, 'a'):
-                    x1_change = -pixel
-                    y1_change = 0
-                elif event.key == pygame.K_w and move_if_not_collision(snake_list, 'w'):
-                    x1_change = 0
-                    y1_change = -pixel
-                elif event.key == pygame.K_s and move_if_not_collision(snake_list, 's'):
-                    x1_change = 0
-                    y1_change = pixel
-                elif event.key == pygame.K_d and move_if_not_collision(snake_list, 'd'): 
-                    x1_change = pixel
-                    y1_change = 0
- 
+                quit_game()
+            keypress = move_keypress(event)
+            if keypress != None:
+                x1_change = keypress[0]
+                y1_change = keypress[1]
+
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0: 
             game_close = True  
  
@@ -152,7 +165,7 @@ def gameloop():
             if x == snake_head:
                 game_close = True
         
-        draw_snake(snake_list, white, 10)
+        draw_snake(snake_list)
         score = length_of_snake // 10
         render_text_and_position('Your score: ' + str(score), score_font, yellow)
  

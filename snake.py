@@ -67,7 +67,7 @@ def endgame_dis(score):
         if event.type == pygame.QUIT:
             quit_game()
         elif event.type == pygame.KEYDOWN:
-            endgame_keypress(event)
+            return endgame_keypress(event)
 
 
 def move_keypress(event, snake_list):

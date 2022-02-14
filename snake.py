@@ -41,22 +41,26 @@ def quit_game():
     pygame.quit()
     quit()
 
-def endgame_keypress(event):
+def restart_game():
     global x1, y1, x1_change, y1_change, snake_list, length_of_snake, foodx, foody, game, endgame
+    dis.fill(black)
+    x1 = dis_width / 2
+    y1 = dis_height / 2
+    x1_change = 0 
+    y1_change = 0 
+    snake_list = []
+    length_of_snake = 1
+    foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
+    foody = round(random.randrange(food_radius, dis_height - food_radius)) 
+    game = True
+    endgame = False
+
+def endgame_keypress(event):
     if event.key == pygame.K_q:
         quit_game()
     elif event.key == pygame.K_p:  
         dis.fill(black)
-        x1 = dis_width / 2
-        y1 = dis_height / 2
-        x1_change = 0 
-        y1_change = 0 
-        snake_list = []
-        length_of_snake = 1
-        foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
-        foody = round(random.randrange(food_radius, dis_height - food_radius)) 
-        game = True
-        endgame = False
+        restart_game()
 
 def endgame_dis(score, height_of_score = 3,
     height_of_message = 2,
@@ -78,47 +82,27 @@ def endgame_dis(score, height_of_score = 3,
 def move_keypress(event, snake_list) -> tuple:
     stepSize = 1
     if event.key == pygame.K_w:
-        if check_collision(snake_list, 'w'):
-            deltaX = 0
-            deltaY = -stepSize
-            return deltaX, deltaY
+        deltaX = 0
+        deltaY = -stepSize
+        return deltaX, deltaY
     elif event.key == pygame.K_a:
-        if check_collision(snake_list, 'a'):
-            deltaX = -stepSize
-            deltaY = 0
-            return deltaX, deltaY
+        deltaX = -stepSize
+        deltaY = 0
+        return deltaX, deltaY
     elif event.key == pygame.K_s:
-        if check_collision(snake_list, 's'):
-            deltaX = 0
-            deltaY = stepSize
-            return deltaX, deltaY
+        deltaX = 0
+        deltaY = stepSize
+        return deltaX, deltaY
     elif event.key == pygame.K_d:
-        if check_collision(snake_list, 'd'):
-            deltaX = stepSize
-            deltaY = 0
-            return deltaX, deltaY
+        deltaX = stepSize
+        deltaY = 0
+        return deltaX, deltaY
 
-def check_collision(snake_list, key) -> bool:
-    if key == 'a':
-        if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] + 1): 
-            return True 
-        else:
-            return False
-    elif key == 'w':
-        if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] + 1):
-            return True
-        else:
-            return False
-    elif key == 's':
-        if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] - 1):
-            return True
-        else:
-            return False
-    elif key == 'd': 
-        if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] - 1):
-            return True
-        else:
-            return False
+def check_collision(snake_list, x1_change, y1_change):
+    if len(snake_list) > 1:
+        if x1 == snake_list[-1][0] and y1 == snake_list[-1][1]:
+            x1_change = 0
+            y1_change = 0
 
 def draw_snake(snake_list, color = white, circle_rad = 10):
     for element in snake_list:
@@ -175,16 +159,17 @@ def gameloop():
                 if keypress != None:
                     x1_change = keypress[0]
                     y1_change = keypress[1]
+        
+        # collision and game objects block
+        check_collision(snake_list, x1_change, y1_change)
         x1 += x1_change
         y1 += y1_change
-        
-        # collision block
         Ouroboros(snake_form())
         while endgame == True: 
             endgame_dis(score)
         check_borders()
         snake_eat()
-
+        
         # draw block
         dis.fill(black)
         draw_food()

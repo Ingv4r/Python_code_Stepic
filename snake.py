@@ -7,24 +7,16 @@ pygame.init()
 dis_width = 800
 dis_height = 600
 dis = pygame.display.set_mode((dis_width, dis_height)) 
-pygame.display.set_caption("Igor's first snake game 1.0") 
- 
 white = (255, 255, 255) 
 black = (30, 30, 50)
 yellow = (255, 255, 102) 
 red = (213, 50, 80) 
 green = (0, 255, 0) 
- 
-dis.fill(black)
- 
 clock = pygame.time.Clock() 
- 
 font_style = pygame.font.SysFont('bahnschrift', 30)
 score_font = pygame.font.SysFont('comicsansms', 35) 
-
 snake_speed = 180
 food_radius = 8
-
 x1 = dis_width / 2
 y1 = dis_height / 2
 x1_change = 0 
@@ -36,6 +28,8 @@ foody = round(random.randrange(food_radius, dis_height - food_radius))
 game = True
 endgame = False
 
+pygame.display.set_caption("Igor's first snake game v1.01")
+dis.fill(black)
 
 def quit_game():
     pygame.quit()
@@ -79,7 +73,7 @@ def endgame_dis(score, height_of_score = 3,
             return endgame_keypress(event)
 
 
-def move_keypress(event, snake_list) -> tuple:
+def move_keypress(event) -> tuple:
     stepSize = 1
     if event.key == pygame.K_w:
         deltaX = 0
@@ -98,7 +92,7 @@ def move_keypress(event, snake_list) -> tuple:
         deltaY = 0
         return deltaX, deltaY
 
-def check_collision(snake_list, x1_change, y1_change):
+def check_misclick(snake_list, x1_change, y1_change):
     if len(snake_list) > 1:
         if x1 == snake_list[-1][0] and y1 == snake_list[-1][1]:
             x1_change = 0
@@ -155,13 +149,13 @@ def gameloop():
             if event.type == pygame.QUIT: 
                 quit_game()
             elif event.type == pygame.KEYDOWN:
-                keypress = move_keypress(event, snake_list)
+                keypress = move_keypress(event)
                 if keypress != None:
                     x1_change = keypress[0]
                     y1_change = keypress[1]
         
         # collision and game objects block
-        check_collision(snake_list, x1_change, y1_change)
+        check_misclick(snake_list, x1_change, y1_change)
         x1 += x1_change
         y1 += y1_change
         Ouroboros(snake_form())

@@ -41,7 +41,7 @@ def m():
                     if event.key == pg.K_RETURN:
                         print(text)
                         text = ''
-                        import snake
+                      
                     elif event.key == pg.K_BACKSPACE:
                         text = text[:-1]
                     else:

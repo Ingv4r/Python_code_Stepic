@@ -75,28 +75,32 @@ def endgame_dis(score, height_of_score = 3,
 
 def move_keypress(event) -> tuple:
     stepSize = 1
-    if event.key == pygame.K_w:
+    if event.key == pygame.K_w and check_direction('w'):
         deltaX = 0
         deltaY = -stepSize
         return deltaX, deltaY
-    elif event.key == pygame.K_a:
+    elif event.key == pygame.K_a and check_direction('a'):
         deltaX = -stepSize
         deltaY = 0
         return deltaX, deltaY
-    elif event.key == pygame.K_s:
+    elif event.key == pygame.K_s and check_direction('s'):
         deltaX = 0
         deltaY = stepSize
         return deltaX, deltaY
-    elif event.key == pygame.K_d:
+    elif event.key == pygame.K_d and check_direction('d'):
         deltaX = stepSize
         deltaY = 0
         return deltaX, deltaY
 
-def check_misclick(snake_list, x1_change, y1_change):
-    if len(snake_list) > 1:
-        if x1 == snake_list[-1][0] and y1 == snake_list[-1][1]:
-            x1_change = 0
-            y1_change = 0
+def check_direction(key) -> bool: 
+    if key == 'a':
+        return True if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] + 1) else False
+    elif key == 'w':
+        return True if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] + 1) else False
+    elif key == 's':
+        return True if len(snake_list) == 1 or snake_list[-1][1] != (snake_list[-2][1] - 1) else False
+    elif key == 'd': 
+        return True if len(snake_list) == 1 or snake_list[-1][0] != (snake_list[-2][0] - 1) else False
 
 def draw_snake(snake_list, color = white, circle_rad = 10):
     for element in snake_list:
@@ -124,6 +128,9 @@ def snake_form():
     snake_list.append(snake_head)
     if len(snake_list) > length_of_snake:
             del snake_list[0]
+    if len(snake_list) > 1:
+        if snake_list[-1] == snake_list[-2]:
+            snake_list.pop()
     return snake_head
 
 def Ouroboros(snake_head):
@@ -153,12 +160,14 @@ def gameloop():
                 if keypress != None:
                     x1_change = keypress[0]
                     y1_change = keypress[1]
-        
-        # collision and game objects block
-        check_misclick(snake_list, x1_change, y1_change)
+
+        # snake form block        
         x1 += x1_change
         y1 += y1_change
-        Ouroboros(snake_form())
+        head = snake_form()
+
+        # collision block
+        Ouroboros(head)
         while endgame == True: 
             endgame_dis(score)
         check_borders()

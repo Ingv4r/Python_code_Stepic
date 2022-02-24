@@ -1,5 +1,6 @@
 import pygame
 import random
+import hello_menu as menu
 
 pygame.init() 
 
@@ -38,7 +39,7 @@ pygame.display.set_caption("Igor's first snake game v1.01")
 dis.fill(black)
 
 def game_settings(width, height, dificulty):
-    global dis_width, dis_height, food_radius, snake_speed
+    global dis, dis_width, dis_height, food_radius, snake_speed
     if dificulty == 'easy':
         food_radius = 10
         snake_speed = 150
@@ -49,7 +50,9 @@ def game_settings(width, height, dificulty):
         food_radius = 5
         snake_speed = 220
     dis_width = width
-    dis_height = height
+    dis_height = height    
+    dis = pygame.display.set_mode((dis_width, dis_height))
+    
 
 def quit_game():
     pygame.quit()
@@ -76,6 +79,15 @@ def endgame_keypress(event):
         dis.fill(black)
         restart_game()
 
+def menu_button():
+    menu_box = pygame.Rect(dis_width / 2.27, dis_height / 1.3 , 85, 40)
+    font = pygame.font.Font(None, 40)
+    color = (255, 255, 255)
+    text = font.render('Menu', True, color)
+    dis.blit(text, (menu_box.x+5, menu_box.y+7))
+    pygame.draw.rect(dis, color, menu_box, 2)
+    return menu_box
+
 def endgame_dis(score):
     height_of_score = dis_height / 3
     height_of_message = dis_height / 2
@@ -84,7 +96,8 @@ def endgame_dis(score):
     dis.fill(black) 
     render_text_and_position("Your score: " + str(score), score_font, white, dis, width_of_score, height_of_score)
     render_text_and_position("Press 'Q' to Quit or 'P' to Play Again", font_style, red, dis, width_of_message, height_of_message)
-             
+    button = menu_button()
+    
     pygame.display.update()        
          
     for event in pygame.event.get(): 
@@ -92,6 +105,10 @@ def endgame_dis(score):
             quit_game()
         elif event.type == pygame.KEYDOWN:
             return endgame_keypress(event)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if button.collidepoint(event.pos):
+                menu.main()
+                quit_game()
 
 def move_keypress(event) -> tuple:
     stepSize = 1
@@ -168,7 +185,7 @@ def snake_eat():
             length_of_snake += 10
 
 def gameloop(): 
-    global x1, y1, x1_change, y1_change, snake_list, length_of_snake, foodx, foody, game, endgame
+    global x1, y1, x1_change, y1_change, snake_list, length_of_snake, foodx, foody, score, game, endgame
 
     while game: 
         # get event block
@@ -189,7 +206,7 @@ def gameloop():
         # collision block
         Ouroboros(head)
         while endgame == True: 
-            endgame_dis(score)
+            endgame_dis(length_of_snake // 10)
         check_borders()
         snake_eat()
         
@@ -197,8 +214,7 @@ def gameloop():
         dis.fill(black)
         draw_food()
         draw_snake(snake_list)
-        score = length_of_snake // 10
-        render_text_and_position('Your score: ' + str(score), score_font, yellow, dis)
+        render_text_and_position('Your score: ' + str(length_of_snake // 10), score_font, yellow, dis)
         pygame.display.update() 
 
         clock.tick(snake_speed) 

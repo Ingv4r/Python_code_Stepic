@@ -1,12 +1,11 @@
-import pygame
 import random 
+import pygame
 import hello_menu
 
-pygame.init()
-pygame.display.set_caption("Igor's first snake game v1.5")
-
 class GameVariables():
-    def __init__(self, dis_width, dis_height, food_radius, snake_speed) -> None:
+
+    def __init__(self, dis_width, dis_height, 
+                 food_radius, snake_speed) -> None:      
         self.dis_width = dis_width
         self.dis_height = dis_height
         self.dis = pygame.display.set_mode((dis_width, dis_height)) 
@@ -26,13 +25,26 @@ class GameVariables():
         self.y1_change = 0 
         self.snake_list = []
         self.length_of_snake = 1
-        self.foodx = round(random.randrange(food_radius, dis_width - food_radius)) 
-        self.foody = round(random.randrange(food_radius, dis_height - food_radius)) 
+        self.foodx = round(
+            random.randrange(
+                food_radius, dis_width - food_radius
+                )
+            ) 
+        self.foody = round(
+            random.randrange(
+                food_radius, dis_height - food_radius
+                )
+            ) 
         self.game = True
         self.endgame = False
 
+
+pygame.init()
+pygame.display.set_caption("Igor's first snake game v1.5")
+
 def menu_button():
-    menu_box = pygame.Rect(snake.dis_width / 2.27, snake.dis_height / 1.3 , 85, 40)
+    menu_box = pygame.Rect(snake.dis_width / 2.27, 
+                           snake.dis_height / 1.3 , 85, 40)
     font = pygame.font.Font(None, 40)
     color = (255, 255, 255)
     text = font.render('Menu', True, color)
@@ -65,8 +77,18 @@ def restart_game():
     snake.y1_change = 0 
     snake.snake_list = []
     snake.length_of_snake = 1
-    snake.foodx = round(random.randrange(snake.food_radius, snake.dis_width - snake.food_radius)) 
-    snake.foody = round(random.randrange(snake.food_radius, snake.dis_height - snake.food_radius)) 
+    snake.foodx = round(
+        random.randrange(
+            snake.food_radius, 
+            snake.dis_width - snake.food_radius
+            )
+        )
+    snake.foody = round(
+        random.randrange(
+            snake.food_radius, 
+            snake.dis_height - snake.food_radius
+            )
+        ) 
     snake.game = True
     snake.endgame = False
 
@@ -84,9 +106,12 @@ def endgame_dis(score):
     width_of_message = snake.dis_width / 2
     snake.dis.fill(snake.black) 
     render_text_and_position("Your score: " + str(score), 
-    snake.score_font, snake.white, snake.dis, width_of_score, height_of_score)
-    render_text_and_position("Press 'Q' to Quit or 'P' to Play Again", snake.font_style, 
-    snake.red, snake.dis, width_of_message, height_of_message)
+                             snake.score_font, snake.white, 
+                             snake.dis, width_of_score, 
+                             height_of_score)
+    render_text_and_position("Press 'Q' to Quit or 'P' to Play Again", 
+                             snake.font_style, snake.red, snake.dis, 
+                             width_of_message, height_of_message)
     menu = menu_button()
 
     pygame.display.update()        
@@ -123,21 +148,33 @@ def move_keypress(event) -> tuple:
 
 def check_direction(key) -> bool: 
     if key == 'a':
-        return True if len(snake.snake_list) == 1 or snake.snake_list[-1][0] != (snake.snake_list[-2][0] + 1) else False
+        return (True if len(snake.snake_list) == 1 or
+                snake.snake_list[-1][0] != 
+                (snake.snake_list[-2][0] + 1) else False)
     elif key == 'w':
-        return True if len(snake.snake_list) == 1 or snake.snake_list[-1][1] != (snake.snake_list[-2][1] + 1) else False
+        return (True if len(snake.snake_list) == 1 or 
+                snake.snake_list[-1][1] != 
+                (snake.snake_list[-2][1] + 1) else False)
     elif key == 's':
-        return True if len(snake.snake_list) == 1 or snake.snake_list[-1][1] != (snake.snake_list[-2][1] - 1) else False
+        return (True if len(snake.snake_list) == 1 or 
+                snake.snake_list[-1][1] != 
+                (snake.snake_list[-2][1] - 1) else False)
     elif key == 'd': 
-        return True if len(snake.snake_list) == 1 or snake.snake_list[-1][0] != (snake.snake_list[-2][0] - 1) else False
+        return (True if len(snake.snake_list) == 1 or
+                snake.snake_list[-1][0] != 
+                (snake.snake_list[-2][0] - 1) else False)
 
 def draw_snake(snake_list):
     color = snake.white
     circle_rad = 10
     for element in snake_list:
-        pygame.draw.circle(snake.dis, color, (element[0], element[1]), circle_rad)
+        pygame.draw.circle(snake.dis, color, 
+                           (element[0], element[1]), 
+                           circle_rad)
 
-def render_text_and_position(text, font, color, display, width = 0, height = 0): 
+def render_text_and_position(text, font, color, 
+                             display, width = 0, 
+                             height = 0): 
     message = font.render(text, True, color)
     position = [0, 0]
     if width != 0 and height != 0:
@@ -145,10 +182,16 @@ def render_text_and_position(text, font, color, display, width = 0, height = 0):
     display.blit(message, position)
 
 def draw_food():
-    pygame.draw.circle(snake.dis, snake.green, (snake.foodx, snake.foody), snake.food_radius)
+    pygame.draw.circle(
+        snake.dis, snake.green, 
+        (snake.foodx, snake.foody), 
+        snake.food_radius
+        )
 
 def check_borders():
-    if snake.x1 >= snake.dis_width or snake.x1 < 0 or snake.y1 >= snake.dis_height or snake.y1 < 0: 
+    if (
+            snake.x1 >= snake.dis_width or snake.x1 < 0 or
+            snake.y1 >= snake.dis_height or snake.y1 < 0): 
         snake.endgame = True 
 
 def snake_form():
@@ -163,20 +206,28 @@ def snake_form():
             snake.snake_list.pop()
     return snake_head
 
-def Ouroboros(snake_head):
-    # snake eat self
+def snake_eat_self(snake_head):
     for x in snake.snake_list[:-1:1]:
             if x == snake_head:
                 snake.endgame = True
 
 def snake_eat():
-    if (snake.foodx - snake.food_radius*2) <= snake.x1 <= (snake.foodx + snake.food_radius*2) and (snake.
-    foody - snake.food_radius*2) <= snake.y1 <= (snake.foody + snake.food_radius*2):
-            snake.foodx = round(random.randrange(snake.food_radius, snake.
-            dis_width - snake.food_radius)) 
-            snake.foody = round(random.randrange(snake.food_radius, snake.
-            dis_height - snake.food_radius)) 
-            snake.length_of_snake += 10
+    if (
+            (snake.foodx - snake.food_radius*2) <= snake.x1 <= 
+            (snake.foodx + snake.food_radius*2) and 
+            (snake.foody - snake.food_radius*2) <= snake.y1 <= 
+            (snake.foody + snake.food_radius*2)):
+        snake.foodx = round(
+            random.randrange(
+                snake.food_radius, 
+                snake.dis_width - snake.food_radius)
+                ) 
+        snake.foody = round(
+            random.randrange(
+                snake.food_radius, 
+                snake.dis_height - snake.food_radius)
+                ) 
+        snake.length_of_snake += 10
 
 def gameloop(): 
     snake.dis.fill(snake.black)
@@ -198,8 +249,8 @@ def gameloop():
         head = snake_form()
 
         # collision block
-        Ouroboros(head)
-        while snake.endgame == True: 
+        snake_eat_self(head)
+        while snake.endgame: 
             endgame_dis(score)
         check_borders()
         snake_eat()
@@ -209,7 +260,10 @@ def gameloop():
         draw_food()
         draw_snake(snake.snake_list)
         score = snake.length_of_snake // 10
-        render_text_and_position('Your score: ' + str(score), snake.score_font, snake.yellow, snake.dis)
+        render_text_and_position(
+            'Your score: ' + str(score), 
+            snake.score_font, snake.yellow, snake.dis
+            )
         pygame.display.update() 
 
         snake.clock.tick(snake.snake_speed) 

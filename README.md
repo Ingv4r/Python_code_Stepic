@@ -1,2 +1,2 @@
-# My first game programm
-my code for snake game on python with using pygame lib
+# My first game program
+my code for snake game in python with using pygame lib

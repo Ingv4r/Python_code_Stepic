@@ -1,6 +1,6 @@
 import pygame as pg
 import snake
-from snake import *
+
 
 pg.init()
 pg.display.set_caption("Igor's first snake game v1.5")
@@ -39,8 +39,11 @@ class buttons_var():
         self.color_med = False
         self.color_hard = False
 
-mn = Menu_var()
-btn = buttons_var() 
+def menu_from_snake():
+    global mn, btn
+    mn = Menu_var()
+    btn = buttons_var()
+    main()
 
 def start_game():
     mn.done = True
@@ -82,7 +85,6 @@ def mouse_click( event):
         btn.active_height = False
     elif btn.Start_box.collidepoint(event.pos):
         mn.done = True
-        pg.quit()
         start_game()
     elif btn.Quit_box.collidepoint(event.pos):
         mn.done = True
@@ -139,8 +141,16 @@ def render_info():
     snake.render_text_and_position('Choose difficulty:', mn.font, (255, 255, 255), mn.screen, 150, 200)
     snake.render_text_and_position('Hello world!', mn.font, (255, 255, 255), mn.screen, 300, 20)
 
+def color_of_buttons():
+    btn.color_width = btn.color_active if btn.active_width else btn.color_inactive
+    btn.color_height = btn.color_active if btn.active_height else btn.color_inactive                
+    btn.color_easy = btn.color_active if btn.active_easy else btn.color_inactive
+    btn.color_med = btn.color_active if btn.active_med else btn.color_inactive
+    btn.color_hard = btn.color_active if btn.active_hard else btn.color_inactive    
+
 def main():
     while not mn.done:
+        color_of_buttons()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 mn.done = True
@@ -149,11 +159,6 @@ def main():
                 # If the user clicked on the input_box rect.
                 mouse_click(event)    
                 # Change the current color of the input box.
-                btn.color_width = btn.color_active if btn.active_width else btn.color_inactive
-                btn.color_height = btn.color_active if btn.active_height else btn.color_inactive                
-                btn.color_easy = btn.color_active if btn.active_easy else btn.color_inactive
-                btn.color_med = btn.color_active if btn.active_med else btn.color_inactive
-                btn.color_hard = btn.color_active if btn.active_hard else btn.color_inactive
             elif event.type == pg.KEYDOWN:
                 buttons_text(event)
                 
@@ -168,5 +173,7 @@ def main():
 
 
 if __name__ == '__main__':
+    mn = Menu_var()
+    btn = buttons_var() 
     main()
     

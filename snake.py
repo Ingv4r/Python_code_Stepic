@@ -1,5 +1,5 @@
-import random
-import pygame
+import random as rand
+import pygame 
 import hello_menu
 
 class GameVariables():
@@ -19,11 +19,14 @@ class GameVariables():
         self.score_font = pygame.font.SysFont('comicsansms', 35) 
         self.snake_speed = snake_speed
         self.food_radius = food_radius
+        self.food_coords = list()
+        self.area = dict()
+        self.snake_rad = 10
         self.x1 = dis_width / 2
         self.y1 = dis_height / 2
         self.x1_change = 0 
         self.y1_change = 0 
-        self.snake_list = []
+        self.snake_list = list()
         self.length_of_snake = 1
         self.game = True
         self.endgame = False
@@ -67,18 +70,8 @@ def restart_game():
     snake.y1_change = 0 
     snake.snake_list = []
     snake.length_of_snake = 1
-    snake.foodx = round(
-        random.randrange(
-            snake.food_radius, 
-            snake.dis_width - snake.food_radius
-            )
-        )
-    snake.foody = round(
-        random.randrange(
-            snake.food_radius, 
-            snake.dis_height - snake.food_radius
-            )
-        ) 
+    food_coords()
+    food_in_snake()
     snake.game = True
     snake.endgame = False
 
@@ -103,9 +96,7 @@ def endgame_dis(score):
                              snake.font_style, snake.red, snake.dis, 
                              width_of_message, height_of_message)
     menu = menu_button()
-
     pygame.display.update()        
-
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT:
             quit_game()
@@ -157,16 +148,15 @@ def check_direction(key) -> bool:
 def draw_snake(snake_list):
     color_body = snake.white
     color_head = snake.red
-    circle_rad = 10
     for element in snake_list:
         if element == snake_list[-1]:
             pygame.draw.circle(snake.dis, color_head, 
                            (element[0], element[1]), 
-                           circle_rad)
+                            snake.snake_rad)
         else:
             pygame.draw.circle(snake.dis, color_body, 
                            (element[0], element[1]), 
-                           circle_rad)
+                           snake.snake_rad)
 
 def render_text_and_position(text, font, color, 
                              display, width = 0, 
@@ -196,7 +186,7 @@ def snake_form():
     snake_head.append(snake.y1)
     snake.snake_list.append(snake_head)
     if len(snake.snake_list) > snake.length_of_snake:
-            del snake.snake_list[0]
+        del snake.snake_list[0]
     if len(snake.snake_list) > 1:
         if snake.snake_list[-1] == snake.snake_list[-2]:
             snake.snake_list.pop()
@@ -207,61 +197,69 @@ def snake_eat_self(snake_head):
             if x == snake_head:
                 snake.endgame = True
 
-
-
-def real_snake_coords(_snake_):
-    advanced_snake_list = []
-    for snake in range(len(_snake_)):
-        for i in range(-10, 10):
-            for j in range(-10, 10):
-                x_coord = _snake_[snake][0] + i
-                y_coord = _snake_[snake][1] + j
-                advanced_snake_list.append([x_coord, y_coord])
-    return advanced_snake_list
-
-def food_coords():
-    available_pixels = []
-    for x in range(
-            snake.food_radius, 
-            snake.dis_width - snake.food_radius
-            ):
-        for y in range(
-                snake.food_radius, 
-                snake.dis_height - snake.food_radius
+def area():
+    # form playing field by cells of food size
+    k = snake.food_radius
+    y = snake.dis_height
+    x = snake.dis_width 
+    for col in range(0, x, k):
+        for line in range(0, y, k):
+            snake.area[(col, line)] = True
+        
+def avaible_food_cell():
+    # make 'False' cells where is snake now
+    k = snake.food_radius
+    game = snake.area
+    for cell in game.keys():
+        for elem in snake.snake_list:
+            if (
+                cell[0] <= elem[0] <= (cell[0]+k) 
+                and   
+                cell[1] <= elem[1] <= (cell[1]+k)
                 ):
-            available_pixels.append([x, y])
+                snake.area[cell] = False
 
-    _snake_ = real_snake_coords(snake.snake_list)
-    for i in _snake_:
-        available_pixels.remove(i)
-    
-    return random.choice(available_pixels)
-    
+def food_coord():
+    # choice cell from 'True' cells
+    k = snake.food_radius // 2
+    coords = list()
+    for i in snake.area.keys():
+        if snake.area[i]:
+            coords.append(list(i))
+    food = rand.choice(coords)
+    food[0] += k
+    food[1] += k
+    snake.food_coords = list(food)
+
+
+'''def food_in_snake():
+    food = snake.food_coords
+    k = snake.snake_rad + snake.food_radius
+    for i in snake.snake_list:
+        if((food[0]-k) <= i[0] <= (food[0]+k) and
+        (food[1]-1) <= i[1] <= (food[1]+k)):
+            snake.list.append(food)
+            food_coords()
+            if snake.food_coords not in snake.list:
+                food_in_snake()
+            else:
+                food_coords()
+        else:
+            snake.list = []'''
 
 def snake_eat(food):
-    
-    if (
-            (food[0] - snake.food_radius*2) <= snake.x1 <= 
-            (food[0] + snake.food_radius*2) and 
-            (food[1] - snake.food_radius*2) <= snake.y1 <= 
-            (food[1] + snake.food_radius*2)):
-        snake.foodx = round(
-            random.randrange(
-                snake.food_radius, 
-                snake.dis_width - snake.food_radius)
-                ) 
-        snake.foody = round(
-            random.randrange(
-                snake.food_radius, 
-                snake.dis_height - snake.food_radius)
-                ) 
+    k = snake.food_radius*2
+    if ((food[0]-k) <= snake.x1 <= (food[0]+k) and 
+    (food[1]-k) <= snake.y1 <= (food[1]+k)):
+        food_coord()
         snake.length_of_snake += 10
+        
 
 def gameloop(): 
     snake.dis.fill(snake.black)
 
     while snake.game: 
-        # get event block
+        # event block
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
                 quit_game()
@@ -271,22 +269,24 @@ def gameloop():
                     snake.x1_change = keypress[0]
                     snake.y1_change = keypress[1]
 
-        # snake and food form block
-        food_center = food_coords()    
+        # game objects form block  
         snake.x1 += snake.x1_change
         snake.y1 += snake.y1_change
         head = snake_form()
-
+        area()
+        avaible_food_cell()
+        food_coord()
+        
         # collision block
         snake_eat_self(head)
         while snake.endgame: 
             endgame_dis(score)
         check_borders()
-        snake_eat(food_center)
+        snake_eat(snake.food_coords)
         
         # draw block
         snake.dis.fill(snake.black)
-        draw_food(food_center)
+        draw_food(snake.food_coords)
         draw_snake(snake.snake_list)
         score = snake.length_of_snake // 10
         render_text_and_position(
